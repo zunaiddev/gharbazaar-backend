@@ -5,9 +5,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRESQL_USER: root
-      POSTGRESQL_PASSWORD: pass
-      POSTGRESQL_DB: gharbazaar
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: gharbazaar
     restart: always
   mailpit:
     image: axllent/mailpit
