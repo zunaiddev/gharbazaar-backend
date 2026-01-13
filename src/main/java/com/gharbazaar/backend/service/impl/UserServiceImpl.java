@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
         final User user = findByEmail(email, false);
 
         if (user != null) {
-            if (user.isActive()) {
+            if (user.isEnabled()) {
                 throw new ConflictException("User already exists");
             }
 

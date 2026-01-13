@@ -45,7 +45,7 @@ public class User {
     private OAuthClient oAuthClient;
 
     @NotNull
-    private boolean active;
+    private boolean enabled;
 
     @NotNull
     private boolean locked;
@@ -58,7 +58,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.status = status;
-        this.active = false;
+        this.enabled = false;
         this.locked = false;
         role = Role.USER;
         oAuthClient = OAuthClient.NONE;
