@@ -47,6 +47,13 @@ public class GlobalExceptionHandler {
         return new ErrorRes(HttpStatus.FORBIDDEN, ErrorCode.DISABLED, "User is Disabled");
     }
 
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorRes handleConflictException(ConflictException ex) {
+        log.error("Conflict Exception: ", ex);
+        return new ErrorRes(HttpStatus.CONFLICT, ex.getCode(), ex.getMessage());
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
@@ -62,5 +69,6 @@ public class GlobalExceptionHandler {
 
         return errors;
     }
+
 
 }

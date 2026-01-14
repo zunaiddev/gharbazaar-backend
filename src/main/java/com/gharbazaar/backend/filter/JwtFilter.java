@@ -3,6 +3,7 @@ package com.gharbazaar.backend.filter;
 import com.gharbazaar.backend.dto.JwtPayload;
 import com.gharbazaar.backend.enums.ErrorCode;
 import com.gharbazaar.backend.enums.Purpose;
+import com.gharbazaar.backend.exception.InvalidPurposeException;
 import com.gharbazaar.backend.service.JwtService;
 import com.gharbazaar.backend.utils.Helper;
 import io.jsonwebtoken.Claims;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -34,10 +36,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain) throws IOException, ServletException {
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
+            log.warn("Invalid Authorization Header: {}", header);
             helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.MISSING_TOKEN, "Authorization header is null or Invalid");
             return;
         }
@@ -46,24 +49,31 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             Claims claims = jwtService.extractClaims(token);
-            JwtPayload payload = new JwtPayload(claims.getSubject(), claims.get("email", String.class),
-                    Purpose.valueOf(claims.get("purpose", String.class)), claims);
+
+            String subject = claims.getSubject();
+
+            if (subject == null) {
+                throw new JwtException("Invalid Jwt Token: Subject is null");
+            }
+
+            JwtPayload payload = new JwtPayload(subject, claims.get("email", String.class),
+                    Purpose.fromString(claims.get("purpose", String.class)), claims);
 
             req.setAttribute("payload", payload);
+
+            chain.doFilter(req, res);
         } catch (ExpiredJwtException exp) {
             log.warn("Expired Jwt Token: {}", exp.getMessage());
             helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_JWT, "Token has expired");
-            return;
         } catch (JwtException exp) {
             log.warn("Invalid Jwt Token: {}", exp.getMessage());
             helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_JWT, "Invalid Jwt Token");
-            return;
+        } catch (InvalidPurposeException exp) {
+            log.warn("Invalid Purpose: {}", exp.getMessage());
+            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, exp.getCode(), exp.getMessage());
         } catch (Exception exp) {
             log.error("Error: {}", exp.getMessage());
             helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");
-            return;
         }
-
-        chain.doFilter(req, res);
     }
 }

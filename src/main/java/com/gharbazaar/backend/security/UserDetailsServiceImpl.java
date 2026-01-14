@@ -22,7 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
 
-        System.out.println("Returned User details");
         return new UserPrincipal(user);
     }
 }

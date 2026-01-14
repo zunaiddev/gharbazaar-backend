@@ -5,6 +5,10 @@ import com.gharbazaar.backend.model.User;
 public interface UserService {
     User create(String name, String email, String password);
 
+    User update(User user);
+
+    User findById(long id);
+
     User findByEmail(String email, boolean throwException);
 
     User findByEmail(String email);

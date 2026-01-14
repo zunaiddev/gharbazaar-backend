@@ -32,7 +32,10 @@ public class AuthServiceImpl implements AuthService {
     public SignupRes signup(SignupReq req) {
         User user = userService.create(req.name(), req.email(), encoder.encode(req.password()));
 
-        emailSender.sendVerificationEmail(user.getEmail(), jwtGenerator.verification(user.getId(), user.getEmail()));
+        String token = jwtGenerator.verification(user.getId(), user.getEmail());
+
+        System.out.println("Verification Token:\n" + token);
+        emailSender.sendVerificationEmail(user.getEmail(), token);
         return new SignupRes(user);
     }
 

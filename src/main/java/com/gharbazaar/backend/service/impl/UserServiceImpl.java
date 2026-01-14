@@ -36,6 +36,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User update(User user) {
+        if (user.getId() == null) throw new IllegalArgumentException("User ID must be provided while updating");
+
+        return repo.save(user);
+    }
+
+    @Override
+    public User findById(long id) {
+        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    @Override
     public User findByEmail(String email, boolean throwException) {
         User user = repo.findByEmail(email).orElse(null);
 
