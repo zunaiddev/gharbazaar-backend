@@ -1,5 +1,6 @@
 package com.gharbazaar.backend.config;
 
+import com.gharbazaar.backend.filter.AuthenticationFilter;
 import com.gharbazaar.backend.filter.JwtFilter;
 import com.gharbazaar.backend.filter.VerificationFilter;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, VerificationFilter verificationFilter) {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
+                                           VerificationFilter verificationFilter, AuthenticationFilter authFilter) {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(HttpMethod.GET, "/health/**").permitAll()
@@ -24,6 +26,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(verificationFilter, JwtFilter.class)
+                .addFilterAfter(authFilter, JwtFilter.class)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable);

@@ -57,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             JwtPayload payload = new JwtPayload(subject, claims.get("email", String.class),
-                    Purpose.fromString(claims.get("purpose", String.class)), claims);
+                    Purpose.fromString(claims.get("purpose", String.class)), token, claims);
 
             req.setAttribute("payload", payload);
 

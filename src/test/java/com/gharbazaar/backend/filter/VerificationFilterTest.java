@@ -44,7 +44,7 @@ class VerificationFilterTest {
 
     @Test
     void doFilterInternal() throws ServletException, IOException {
-        JwtPayload payload = new JwtPayload(1L, "john@gmail.com", Purpose.VERIFICATION);
+        JwtPayload payload = new JwtPayload(1L, "john@gmail.com", Purpose.VERIFICATION, null);
         when(request.getAttribute("payload")).thenReturn(payload);
 
         User user = new User("John", "john@gmail.com", "John@123", UserStatus.UNVERIFIED);
