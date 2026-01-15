@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String URI = request.getRequestURI();
-        return URI.startsWith("/api/auth") || URI.startsWith("/api/health");
+        return !URI.startsWith("/api/users") || !URI.startsWith("/api/verify");
     }
 
     @Override
