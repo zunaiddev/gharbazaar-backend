@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
-        String token = jwtGenerator.verification(user.getId(), user.getEmail());
+        String token = jwtGenerator.authentication(user.getId(), user.getEmail());
 
         return new LoginRes(token, user.getStatus());
     }
