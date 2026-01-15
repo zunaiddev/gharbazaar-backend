@@ -18,7 +18,7 @@ class JwtServiceTest {
     @Order(1)
     void generateToken() throws InterruptedException {
         token = jwtService.generateToken("john@gmail.com", null, Duration.ofMinutes(1L));
-        token = jwtGenerator.authentication(1L, "john@gmail.com");
+        token = jwtGenerator.authentication(1L);
 
         Assertions.assertNotNull(token);
 

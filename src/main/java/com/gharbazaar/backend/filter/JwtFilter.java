@@ -9,8 +9,8 @@ import com.gharbazaar.backend.utils.Helper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req, @NonNull HttpServletResponse res, @NonNull FilterChain chain) throws IOException {
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
@@ -62,12 +62,16 @@ public class JwtFilter extends OncePerRequestFilter {
             req.setAttribute("payload", payload);
 
             chain.doFilter(req, res);
-        } catch (ExpiredJwtException exp) {
-            log.warn("Expired Jwt Token: {}", exp.getMessage());
-            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_JWT, "Token has expired");
         } catch (JwtException exp) {
-            log.warn("Invalid Jwt Token: {}", exp.getMessage());
-            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_JWT, "Invalid Jwt Token");
+            log.warn("Jwt Exception: {}", exp.getMessage());
+            switch (exp) {
+                case MalformedJwtException _ ->
+                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.MALFORMED_JWT, "Malformed Jwt Token");
+                case ExpiredJwtException _ ->
+                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_JWT, "Token has expired");
+                default ->
+                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_JWT, "Invalid Jwt Token");
+            }
         } catch (InvalidPurposeException exp) {
             log.warn("Invalid Purpose: {}", exp.getMessage());
             helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, exp.getCode(), exp.getMessage());

@@ -61,12 +61,16 @@ public class VerificationFilter extends OncePerRequestFilter {
 
             UserDetails userDetails = new UserPrincipal(user);
 
+            req.setAttribute("purpose", purpose);
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
             ));
 
             chain.doFilter(req, res);
-            tokenService.save(payload.token());
+
+            if (res.getStatus() == HttpStatus.OK.value()) {
+                tokenService.save(payload.token());
+            }
         } catch (NumberFormatException e) {
             logger.warn("Invalid Subject: ", e);
             helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SUBJECT, "Invalid Token Subject");

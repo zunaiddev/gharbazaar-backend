@@ -12,4 +12,8 @@ public class EmailSender {
     public void sendVerificationEmail(String to, String token) {
         emailService.sendEmail(to, "Verify your email", "Please verify your email by clicking this link: http://localhost:8080/auth/verification?token=" + token);
     }
+
+    public void sendForgotPasswordEmail(String to, String token) {
+        emailService.sendEmail(to, "Reset your password", "Please reset your password by clicking this link: http://localhost:8080/auth/reset?token=" + token);
+    }
 }

@@ -13,19 +13,23 @@ import java.util.Map;
 public class JwtGenerator {
     private final JwtService jwtService;
 
-    public String verification(long id, String email) {
-        return jwtService.generateToken(id, getPayload(Purpose.VERIFICATION, email), Duration.ofHours(12L));
+    public String verification(long id) {
+        return jwtService.generateToken(id, getPayload(Purpose.VERIFICATION), Duration.ofHours(12L));
     }
 
-    public String authentication(long id, String email) {
-        return jwtService.generateToken(id, getPayload(Purpose.AUTHENTICATION, email), Duration.ofMinutes(15L));
+    public String authentication(long id) {
+        return jwtService.generateToken(id, getPayload(Purpose.AUTHENTICATION), Duration.ofMinutes(15L));
+    }
+
+    public String resetPassword(long id) {
+        return jwtService.generateToken(id, getPayload(Purpose.RESET_PASSWORD), Duration.ofMinutes(15L));
     }
 
     public String refresh(long id, String email) {
-        return jwtService.generateToken(id, Map.of("purpose", Purpose.REFRESH), Duration.ofDays(7L));
+        return jwtService.generateToken(id, getPayload(Purpose.REFRESH), Duration.ofDays(7L));
     }
 
-    private Map<String, Object> getPayload(Purpose purpose, String email) {
-        return Map.of("purpose", purpose, "email", email);
+    private Map<String, Object> getPayload(Purpose purpose) {
+        return Map.of("purpose", purpose);
     }
 }

@@ -1,9 +1,6 @@
 package com.gharbazaar.backend.service.impl;
 
-import com.gharbazaar.backend.dto.LoginReq;
-import com.gharbazaar.backend.dto.LoginRes;
-import com.gharbazaar.backend.dto.SignupReq;
-import com.gharbazaar.backend.dto.SignupRes;
+import com.gharbazaar.backend.dto.*;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.security.UserPrincipal;
 import com.gharbazaar.backend.service.AuthService;
@@ -32,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     public SignupRes signup(SignupReq req) {
         User user = userService.create(req.name(), req.email(), encoder.encode(req.password()));
 
-        String token = jwtGenerator.verification(user.getId(), user.getEmail());
+        String token = jwtGenerator.verification(user.getId());
 
         System.out.println("Verification Token:\n" + token);
         emailSender.sendVerificationEmail(user.getEmail(), token);
@@ -49,8 +46,19 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
-        String token = jwtGenerator.authentication(user.getId(), user.getEmail());
+        String token = jwtGenerator.authentication(user.getId());
 
         return new LoginRes(token, user.getStatus());
+    }
+
+    @Override
+    public ForgotPasswordRes forgotPassword(ForgotPasswordReq req) {
+        final User user = userService.findByEmail(req.email());
+
+        String token = jwtGenerator.resetPassword(user.getId());
+        emailSender.sendForgotPasswordEmail(user.getEmail(), token);
+
+        System.out.println("Reset Password Token:\n" + token);
+        return new ForgotPasswordRes(user.getId(), user.getEmail());
     }
 }

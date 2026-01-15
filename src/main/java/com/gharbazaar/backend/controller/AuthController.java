@@ -1,9 +1,6 @@
 package com.gharbazaar.backend.controller;
 
-import com.gharbazaar.backend.dto.LoginReq;
-import com.gharbazaar.backend.dto.LoginRes;
-import com.gharbazaar.backend.dto.SignupReq;
-import com.gharbazaar.backend.dto.SignupRes;
+import com.gharbazaar.backend.dto.*;
 import com.gharbazaar.backend.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +23,10 @@ public class AuthController {
     @PostMapping("/login")
     public LoginRes login(@RequestBody @Valid LoginReq req) {
         return authService.login(req);
+    }
+
+    @PostMapping("/forgot-password")
+    public ForgotPasswordRes forgotPassword(@RequestBody @Valid ForgotPasswordReq req) {
+        return authService.forgotPassword(req);
     }
 }

@@ -2,15 +2,19 @@ package com.gharbazaar.backend.exception;
 
 import com.gharbazaar.backend.dto.ErrorRes;
 import com.gharbazaar.backend.enums.ErrorCode;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +22,6 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorRes handleException(Exception ex) {
@@ -54,6 +57,40 @@ public class GlobalExceptionHandler {
         return new ErrorRes(HttpStatus.CONFLICT, ex.getCode(), ex.getMessage());
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorRes handleResourceException(NoResourceFoundException ex) {
+        log.error("Not Found Exception: ", ex);
+        return new ErrorRes(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "No static resource " + ex.getResourcePath());
+    }
+
+    @ExceptionHandler(InvalidPurposeException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorRes handlePurposeException(InvalidPurposeException ex) {
+        log.error("Invalid Token Purpose Exception: ", ex);
+        return new ErrorRes(HttpStatus.FORBIDDEN, ex.getCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorRes handleMediaTypeException(HttpMediaTypeNotSupportedException ex) {
+        log.error("Invalid Request body: ", ex);
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY, ex.getMessage());
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorRes handleEntityNotFound(EntityNotFoundException ex) {
+        log.error("Invalid Request body: ", ex);
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorRes handleMessageNotReadableException(HttpMessageNotReadableException ex) {
+        log.error("Invalid Request body: ", ex);
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.MESSAGE_NOT_READEABLE, ex.getMessage());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
@@ -69,6 +106,4 @@ public class GlobalExceptionHandler {
 
         return errors;
     }
-
-
 }
