@@ -26,21 +26,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorRes handleException(Exception ex) {
         log.error("Internal Server Error: ", ex);
-        return new ErrorRes(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something Went Wrong");
+        return new ErrorRes(HttpStatus.INTERNAL_SERVER_ERROR, "Something Went Wrong");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorRes handleLockedException(BadCredentialsException ex) {
         log.error("User is Locked: ", ex);
-        return new ErrorRes(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, "Invalid Email or Password");
+        return new ErrorRes(HttpStatus.UNAUTHORIZED, "Invalid Email or Password");
     }
 
     @ExceptionHandler(LockedException.class)
     @ResponseStatus(HttpStatus.LOCKED)
     public ErrorRes handleLockedException(LockedException ex) {
         log.error("User is Locked: ", ex);
-        return new ErrorRes(HttpStatus.LOCKED, ErrorCode.LOCKED, "User is Locked");
+        return new ErrorRes(HttpStatus.LOCKED, "User is Locked");
     }
 
     @ExceptionHandler(DisabledException.class)
@@ -54,25 +54,25 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorRes handleConflictException(ConflictException ex) {
         log.error("Conflict Exception: ", ex);
-        return new ErrorRes(HttpStatus.CONFLICT, ex.getCode(), ex.getMessage());
+        return new ErrorRes(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorRes handleResourceException(NoResourceFoundException ex) {
         log.error("Not Found Exception: ", ex);
-        return new ErrorRes(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "No static resource " + ex.getResourcePath());
+        return new ErrorRes(HttpStatus.NOT_FOUND, "No static resource " + ex.getResourcePath());
     }
 
     @ExceptionHandler(InvalidPurposeException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorRes handlePurposeException(InvalidPurposeException ex) {
         log.error("Invalid Token Purpose Exception: ", ex);
-        return new ErrorRes(HttpStatus.FORBIDDEN, ex.getCode(), ex.getMessage());
+        return new ErrorRes(HttpStatus.FORBIDDEN, ErrorCode.INVALID_PURPOSE, ex.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleMediaTypeException(HttpMediaTypeNotSupportedException ex) {
         log.error("Invalid Request body: ", ex);
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY, ex.getMessage());
@@ -90,6 +90,27 @@ public class GlobalExceptionHandler {
     public ErrorRes handleMessageNotReadableException(HttpMessageNotReadableException ex) {
         log.error("Invalid Request body: ", ex);
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.MESSAGE_NOT_READEABLE, ex.getMessage());
+    }
+
+    @ExceptionHandler(OAuthException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorRes handleOAuthException(OAuthException ex) {
+        log.error("OAuth Exception: ", ex.getCause());
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.OAUTH_ERROR, ex.getMessage());
+    }
+
+    @ExceptionHandler(ScopeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorRes handleScopeException(ScopeException ex) {
+        log.error("Invalid OAuth Scope: ", ex);
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SCOPE, ex.getMessage());
+    }
+
+    @ExceptionHandler(UnverifiedEmail.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorRes handleUnverifiedEmailException(UnverifiedEmail ex) {
+        log.error("Email is not verified: ", ex);
+        return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.UNVERIFIED_EMAIL, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

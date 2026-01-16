@@ -7,6 +7,8 @@ public interface UserService {
 
     User update(User user);
 
+    User save(User user);
+
     User findById(long id);
 
     User findByEmail(String email, boolean throwException);

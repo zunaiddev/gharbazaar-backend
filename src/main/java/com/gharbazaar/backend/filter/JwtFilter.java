@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String URI = request.getRequestURI();
-        return !URI.startsWith("/api/users") || !URI.startsWith("/api/verify");
+        return URI.startsWith("/api/health") || URI.startsWith("/api/auth");
     }
 
     @Override
@@ -74,7 +74,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (InvalidPurposeException exp) {
             log.warn("Invalid Purpose: {}", exp.getMessage());
-            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, exp.getCode(), exp.getMessage());
+            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_PURPOSE, exp.getMessage());
         } catch (Exception exp) {
             log.error("Error: {}", exp.getMessage());
             helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");

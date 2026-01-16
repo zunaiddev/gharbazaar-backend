@@ -17,4 +17,15 @@ class BackendApplicationTests {
         System.out.println(mapper.writeValueAsString(errorRes));
     }
 
+    @Test
+    void ErrorResTest() {
+        ErrorRes res1 = new ErrorRes(HttpStatus.FORBIDDEN, ErrorCode.DISABLED, "User is Disabled");
+        ErrorRes res2 = new ErrorRes(HttpStatus.FORBIDDEN, "User is Not Allowed");
+        ErrorRes res3 = new ErrorRes(HttpStatus.FORBIDDEN);
+
+        System.out.println(res1);
+        System.out.println(res2);
+        System.out.println(res3);
+    }
+
 }

@@ -79,7 +79,7 @@ public class VerificationFilter extends OncePerRequestFilter {
             helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, "User not found");
         } catch (InvalidPurposeException e) {
             logger.warn("Invalid Purpose: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, e.getCode(), e.getMessage());
+            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PURPOSE, e.getMessage());
         }
     }
 }

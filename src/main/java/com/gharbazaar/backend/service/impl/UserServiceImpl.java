@@ -43,6 +43,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User save(User user) {
+        if (user.getId() != null) throw new RuntimeException("User is is auto generated");
+
+        return repo.save(user);
+    }
+
+    @Override
     public User findById(long id) {
         return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }

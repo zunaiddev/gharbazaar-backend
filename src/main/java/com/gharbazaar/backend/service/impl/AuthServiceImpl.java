@@ -1,14 +1,21 @@
 package com.gharbazaar.backend.service.impl;
 
 import com.gharbazaar.backend.dto.*;
+import com.gharbazaar.backend.enums.OAuthClient;
+import com.gharbazaar.backend.enums.Role;
+import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.model.User;
+import com.gharbazaar.backend.oauth.GoogleAuth;
 import com.gharbazaar.backend.security.UserPrincipal;
 import com.gharbazaar.backend.service.AuthService;
 import com.gharbazaar.backend.service.UserService;
 import com.gharbazaar.backend.utils.EmailSender;
 import com.gharbazaar.backend.utils.JwtGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,8 +29,41 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final PasswordEncoder encoder;
     private final AuthenticationManager authManager;
+    private final GoogleAuth googleAuth;
     private final JwtGenerator jwtGenerator;
     private final EmailSender emailSender;
+
+    @Override
+    public ResponseEntity<LoginRes> googleOAuth(String code) {
+        OAuthUser oAuthUser = googleAuth.getOAuthUser(code);
+
+        User user = userService.findByEmail(oAuthUser.email(), false);
+
+        if (user == null) {
+            User persisted = userService.save(User.builder().name(oAuthUser.name()).email(oAuthUser.email())
+                    .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
+                    .enabled(true).locked(false).build());
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new LoginRes(jwtGenerator.authentication(persisted.getId()), persisted.getStatus()));
+        }
+
+        if (user.isLocked()) throw new LockedException("User is locked");
+
+        //ToDo: Handle marked as deleted case
+
+        if (!user.isEnabled()) {
+            user.setName(oAuthUser.name());
+            user.setOAuthClient(OAuthClient.GOOGLE);
+            user.setEnabled(true);
+            user.setStatus(UserStatus.ACTIVE);
+            user.setPassword(null);
+            userService.update(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus()));
+    }
 
     @Override
     public SignupRes signup(SignupReq req) {
