@@ -5,14 +5,17 @@ import com.gharbazaar.backend.dto.ResetPasswordReq;
 import com.gharbazaar.backend.enums.Purpose;
 import com.gharbazaar.backend.security.UserPrincipal;
 import com.gharbazaar.backend.service.VerificationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping("/verify")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class VerificationController {
     private final VerificationService service;
 
