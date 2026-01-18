@@ -23,7 +23,7 @@ class AuthServiceImplTest {
         Mockito.when(googleAuth.getOAuthUser("code"))
                 .thenReturn(new OAuthUser("John", "john@gmail.com", "sample", true));
 
-        ResponseEntity<LoginRes> res = authService.googleOAuth("code");
+        ResponseEntity<LoginRes> res = authService.googleOAuth("code", null);
 
         System.out.println("Status: " + res.getStatusCode());
     }

@@ -50,6 +50,8 @@ public class User {
     @NotNull
     private boolean locked;
 
+    private LocalDateTime deleteAt;
+
     @NotNull
     private LocalDateTime createdAt;
 
@@ -62,6 +64,7 @@ public class User {
         this.locked = false;
         role = Role.USER;
         oAuthClient = OAuthClient.NONE;
+        deleteAt = null;
     }
 
     @PrePersist

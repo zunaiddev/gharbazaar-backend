@@ -19,7 +19,7 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<LoginRes> googleOAuth(@PathParam("code") @NotBlank(message = "Code is null or blank") String code, HttpServletResponse res) {
-        return authService.googleOAuth(code);
+        return authService.googleOAuth(code, res);
     }
 
     @PostMapping("/signup")
@@ -29,8 +29,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginRes login(@RequestBody @Valid LoginReq req) {
-        return authService.login(req);
+    public LoginRes login(@RequestBody @Valid LoginReq req, HttpServletResponse res) {
+        return authService.login(req, res);
     }
 
     @PostMapping("/forgot-password")

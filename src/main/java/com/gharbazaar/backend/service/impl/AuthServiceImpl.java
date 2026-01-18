@@ -63,9 +63,9 @@ public class AuthServiceImpl implements AuthService {
             userService.update(user);
         }
 
-        if (user.getStatus().equals(UserStatus.MARK_AS_DELETED)) {
+        if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus()));
+                    .body(new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus(), user.getDeleteAt()));
         }
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -94,8 +94,8 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
-        if (user.getStatus().equals(UserStatus.MARK_AS_DELETED)) {
-            return new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus());
+        if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
+            return new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus(), user.getDeleteAt());
         }
 
         Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
