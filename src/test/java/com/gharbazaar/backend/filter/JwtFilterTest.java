@@ -1,7 +1,6 @@
 package com.gharbazaar.backend.filter;
 
 import com.gharbazaar.backend.service.JwtService;
-import com.gharbazaar.backend.utils.Helper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,9 +21,6 @@ class JwtFilterTest {
 
     @Mock
     private JwtService jwtService;
-
-    @Mock
-    private Helper helper;
 
     @Mock
     private HttpServletRequest request;

@@ -2,6 +2,7 @@ package com.gharbazaar.backend.controller;
 
 import com.gharbazaar.backend.dto.*;
 import com.gharbazaar.backend.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.websocket.server.PathParam;
@@ -17,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/google")
-    public ResponseEntity<LoginRes> googleOAuth(@PathParam("code") @NotBlank(message = "Code is null or blank") String code) {
+    public ResponseEntity<LoginRes> googleOAuth(@PathParam("code") @NotBlank(message = "Code is null or blank") String code, HttpServletResponse res) {
         return authService.googleOAuth(code);
     }
 

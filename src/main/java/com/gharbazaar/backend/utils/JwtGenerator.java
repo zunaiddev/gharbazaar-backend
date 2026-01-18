@@ -25,11 +25,17 @@ public class JwtGenerator {
         return jwtService.generateToken(id, getPayload(Purpose.RESET_PASSWORD), Duration.ofMinutes(15L));
     }
 
-    public String refresh(long id, String email) {
-        return jwtService.generateToken(id, getPayload(Purpose.REFRESH), Duration.ofDays(7L));
+    public String refresh(long id) {
+        return jwtService.generateToken(id, getPayload(Purpose.REFRESH), Duration.ofDays(15L));
+    }
+
+    public String reactivate(Long id) {
+        return jwtService.generateToken(id, getPayload(Purpose.REACTIVATE), Duration.ofMinutes(15L));
     }
 
     private Map<String, Object> getPayload(Purpose purpose) {
         return Map.of("purpose", purpose);
     }
+
+
 }

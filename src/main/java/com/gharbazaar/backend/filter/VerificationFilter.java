@@ -30,7 +30,6 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class VerificationFilter extends OncePerRequestFilter {
-    private final Helper helper;
     private final UserService service;
     private final UsedTokenService tokenService;
 
@@ -46,7 +45,7 @@ public class VerificationFilter extends OncePerRequestFilter {
 
         if (tokenService.exists(payload.token())) {
             logger.warn("Received Token is already used:");
-            helper.sendErrorRes(res, HttpStatus.IM_USED, ErrorCode.USED_TOKEN, "Token has already been used");
+            Helper.sendErrorRes(res, HttpStatus.IM_USED, ErrorCode.USED_TOKEN, "Token has already been used");
             return;
         }
 
@@ -73,13 +72,13 @@ public class VerificationFilter extends OncePerRequestFilter {
             }
         } catch (NumberFormatException e) {
             logger.warn("Invalid Subject: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SUBJECT, "Invalid Token Subject");
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SUBJECT, "Invalid Token Subject");
         } catch (EntityNotFoundException e) {
             logger.warn("User not found: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, "User not found");
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, "User not found");
         } catch (InvalidPurposeException e) {
             logger.warn("Invalid Purpose: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PURPOSE, e.getMessage());
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PURPOSE, e.getMessage());
         }
     }
 }

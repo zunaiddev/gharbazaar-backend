@@ -27,7 +27,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final Helper helper;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -43,7 +42,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (header == null || !header.startsWith("Bearer ")) {
             log.warn("Invalid Authorization Header: {}", header);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.MISSING_TOKEN, "Authorization header is null or Invalid");
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.MISSING_TOKEN, "Authorization header is null or Invalid");
             return;
         }
 
@@ -68,18 +67,18 @@ public class JwtFilter extends OncePerRequestFilter {
             log.warn("Jwt Exception: {}", exp.getMessage());
             switch (exp) {
                 case MalformedJwtException _ ->
-                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.MALFORMED_JWT, "Malformed Jwt Token");
+                        Helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.MALFORMED_JWT, "Malformed Jwt Token");
                 case ExpiredJwtException _ ->
-                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_JWT, "Token has expired");
+                        Helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_JWT, "Token has expired");
                 default ->
-                        helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_JWT, "Invalid Jwt Token");
+                        Helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_JWT, "Invalid Jwt Token");
             }
         } catch (InvalidPurposeException exp) {
             log.warn("Invalid Purpose: {}", exp.getMessage());
-            helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_PURPOSE, exp.getMessage());
+            Helper.sendErrorRes(res, HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_PURPOSE, exp.getMessage());
         } catch (Exception exp) {
             log.error("Error: {}", exp.getMessage());
-            helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");
+            Helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
     }
 }

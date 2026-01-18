@@ -1,5 +1,5 @@
 package com.gharbazaar.backend.enums;
 
 public enum UserStatus {
-    UNVERIFIED, ACTIVE
+    UNVERIFIED, MARK_AS_DELETED, ACTIVE
 }

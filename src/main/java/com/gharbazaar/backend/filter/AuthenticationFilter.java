@@ -32,7 +32,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
     private final UserService service;
-    private final Helper helper;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
@@ -74,36 +73,36 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(req, res);
         } catch (NumberFormatException e) {
             logger.warn("Invalid Subject: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SUBJECT, "Invalid Token Subject");
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SUBJECT, "Invalid Token Subject");
         } catch (EntityNotFoundException e) {
             logger.warn("User not found: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, "User not found");
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, "User not found");
         } catch (InvalidPurposeException e) {
             logger.warn("Invalid Purpose: ", e);
-            helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PURPOSE, e.getMessage());
+            Helper.sendErrorRes(res, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PURPOSE, e.getMessage());
         } catch (AccountStatusException e) {
             logger.warn("Account Status Exception: ", e);
 
             switch (e) {
                 case DisabledException _ -> {
-                    helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.DISABLED, e.getMessage());
+                    Helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.DISABLED, e.getMessage());
                     return;
                 }
                 case LockedException _ -> {
-                    helper.sendErrorRes(res, HttpStatus.LOCKED, ErrorCode.LOCKED, e.getMessage());
+                    Helper.sendErrorRes(res, HttpStatus.LOCKED, ErrorCode.LOCKED, e.getMessage());
                     return;
                 }
                 case InactiveUserException _ -> {
-                    helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, e.getMessage());
+                    Helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, e.getMessage());
                     return;
                 }
-                default -> helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Forbidden");
+                default -> Helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Forbidden");
             }
 
-            helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Forbidden");
+            Helper.sendErrorRes(res, HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, "Forbidden");
         } catch (Exception e) {
             logger.error("Error: ", e);
-            helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");
+            Helper.sendErrorRes(res, HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
     }
 }

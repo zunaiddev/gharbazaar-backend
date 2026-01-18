@@ -10,7 +10,9 @@ import com.gharbazaar.backend.security.UserPrincipal;
 import com.gharbazaar.backend.service.AuthService;
 import com.gharbazaar.backend.service.UserService;
 import com.gharbazaar.backend.utils.EmailSender;
+import com.gharbazaar.backend.utils.Helper;
 import com.gharbazaar.backend.utils.JwtGenerator;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailSender emailSender;
 
     @Override
-    public ResponseEntity<LoginRes> googleOAuth(String code) {
+    public ResponseEntity<LoginRes> googleOAuth(String code, HttpServletResponse res) {
         OAuthUser oAuthUser = googleAuth.getOAuthUser(code);
 
         User user = userService.findByEmail(oAuthUser.email(), false);
@@ -44,13 +46,13 @@ public class AuthServiceImpl implements AuthService {
                     .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
                     .enabled(true).locked(false).build());
 
+            Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId()));
+
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new LoginRes(jwtGenerator.authentication(persisted.getId()), persisted.getStatus()));
         }
 
         if (user.isLocked()) throw new LockedException("User is locked");
-
-        //ToDo: Handle marked as deleted case
 
         if (!user.isEnabled()) {
             user.setName(oAuthUser.name());
@@ -59,6 +61,11 @@ public class AuthServiceImpl implements AuthService {
             user.setStatus(UserStatus.ACTIVE);
             user.setPassword(null);
             userService.update(user);
+        }
+
+        if (user.getStatus().equals(UserStatus.MARK_AS_DELETED)) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus()));
         }
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -77,8 +84,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginRes login(LoginReq req) {
-        Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(req.email(), req.password()));
+    public LoginRes login(LoginReq req, HttpServletResponse res) {
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.email(), req.password()));
 
         if (!auth.isAuthenticated()) {
             throw new IllegalArgumentException("Invalid credentials");
@@ -86,9 +94,17 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
-        String token = jwtGenerator.authentication(user.getId());
+        if (user.getStatus().equals(UserStatus.MARK_AS_DELETED)) {
+            return new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus());
+        }
 
-        return new LoginRes(token, user.getStatus());
+        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
+        return new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus());
+    }
+
+    @Override
+    public void logout(HttpServletResponse res) {
+        Helper.removeCookie(res);
     }
 
     @Override
