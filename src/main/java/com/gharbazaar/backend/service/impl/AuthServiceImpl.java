@@ -61,6 +61,10 @@ public class AuthServiceImpl implements AuthService {
             user.setStatus(UserStatus.ACTIVE);
             user.setPassword(null);
             userService.update(user);
+
+            Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus()));
         }
 
         if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
