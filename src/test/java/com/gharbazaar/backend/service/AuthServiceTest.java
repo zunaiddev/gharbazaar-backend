@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
@@ -45,9 +44,11 @@ class AuthServiceTest {
     @Order(1)
     void googleOAuth() {
         ArgumentCaptor<Cookie> cookieCaptor = ArgumentCaptor.forClass(Cookie.class);
-        when(googleAuth.getOAuthUser(ArgumentMatchers.anyString()))
+        when(googleAuth.getOAuthUser("testCode"))
                 .thenReturn(new OAuthUser("AuthUser", "auth@gmail.com", "test", true));
 
+        // First case: where the user sings up manually and then Sings up with the same Google account without verifying his email
+        service.signup(new SignupReq("AuthUser", "auth@gmail.com", "Temp@123"));
 
         ResponseEntity<LoginRes> res = service.googleOAuth("testCode", this.response);
 
@@ -55,10 +56,12 @@ class AuthServiceTest {
 
         verify(response).addCookie(cookieCaptor.capture());
         Cookie cookie = cookieCaptor.getValue();
-
         TestHelper.printCookie(cookie);
-
         System.out.println("Login Response: " + res.getBody());
+
+        //Second case: A Fresh User
+        when(googleAuth.getOAuthUser("freshCode"))
+                .thenReturn(new OAuthUser("Fresh user", "freshuser@gmail.com", "fresh", true));
     }
 
     @Test
