@@ -25,7 +25,7 @@ public class Helper {
     public static void setRefreshCookie(HttpServletResponse res, String token) {
         Cookie cookie = new Cookie("refreshToken", token);
         cookie.setHttpOnly(true);
-        cookie.setMaxAge(Duration.ofDays(15L).toMillisPart());
+        cookie.setMaxAge((int) Duration.ofDays(15L).toSeconds());
         cookie.setPath("/");
         cookie.setSecure(true);
 

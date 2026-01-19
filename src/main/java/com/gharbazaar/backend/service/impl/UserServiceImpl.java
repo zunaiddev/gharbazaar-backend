@@ -8,6 +8,7 @@ import com.gharbazaar.backend.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -37,14 +38,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        if (user.getId() == null) throw new IllegalArgumentException("User ID must be provided while updating");
+        if (user.getId() == null) throw new IllegalStateException("User ID must be provided while updating");
 
         return repo.save(user);
     }
 
     @Override
     public User save(User user) {
-        if (user.getId() != null) throw new RuntimeException("User is is auto generated");
+        if (user.getId() != null) throw new IllegalStateException("User id is auto generated");
 
         return repo.save(user);
     }
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
         User user = repo.findByEmail(email).orElse(null);
 
         if (user == null && throwException) {
-            throw new EntityNotFoundException("User not found");
+            throw new EntityNotFoundException("User not found with email: " + email);
         }
 
         return user;
@@ -68,5 +69,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(String email) {
         return findByEmail(email, true);
+    }
+
+    @Override
+    public User uploadAvatar(User user, MultipartFile file) {
+//        file.transferTo();
+        return null;
     }
 }

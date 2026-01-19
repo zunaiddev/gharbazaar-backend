@@ -68,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
                     .body(new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus(), user.getDeleteAt()));
         }
 
+        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus()));
     }

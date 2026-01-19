@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
+
 class BackendApplicationTests {
 
     @Test
@@ -26,6 +28,11 @@ class BackendApplicationTests {
         System.out.println(res1);
         System.out.println(res2);
         System.out.println(res3);
+    }
+
+    @Test
+    void DurationTest() {
+        System.out.println(Duration.ofDays(15L).toSeconds());
     }
 
 }
