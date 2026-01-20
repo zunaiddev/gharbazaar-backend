@@ -46,10 +46,10 @@ public class AuthServiceImpl implements AuthService {
                     .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
                     .enabled(true).locked(false).build());
 
-            Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId()));
+            Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId(), persisted.getRole()));
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new LoginRes(jwtGenerator.authentication(persisted.getId()), persisted.getStatus()));
+                    .body(new LoginRes(jwtGenerator.authentication(persisted.getId(), persisted.getRole()), persisted.getStatus()));
         }
 
         if (user.isLocked()) throw new LockedException("User is locked");
@@ -62,26 +62,26 @@ public class AuthServiceImpl implements AuthService {
             user.setPassword(null);
             userService.update(user);
 
-            Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
+            Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus()));
+                    .body(new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus()));
         }
 
         if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus(), user.getDeleteAt()));
+                    .body(new LoginRes(jwtGenerator.reactivate(user.getId(), user.getRole()), user.getStatus(), user.getDeleteAt()));
         }
 
-        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
+        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus()));
+                .body(new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus()));
     }
 
     @Override
     public SignupRes signup(SignupReq req) {
         User user = userService.create(req.name(), req.email(), encoder.encode(req.password()));
 
-        String token = jwtGenerator.verification(user.getId());
+        String token = jwtGenerator.verification(user.getId(), user.getRole());
 
         System.out.println("Verification Token:\n" + token);
         emailSender.sendVerificationEmail(user.getEmail(), token);
@@ -100,11 +100,11 @@ public class AuthServiceImpl implements AuthService {
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
         if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
-            return new LoginRes(jwtGenerator.reactivate(user.getId()), user.getStatus(), user.getDeleteAt());
+            return new LoginRes(jwtGenerator.reactivate(user.getId(), user.getRole()), user.getStatus(), user.getDeleteAt());
         }
 
-        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId()));
-        return new LoginRes(jwtGenerator.authentication(user.getId()), user.getStatus());
+        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
+        return new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus());
     }
 
     @Override
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
     public ForgotPasswordRes forgotPassword(ForgotPasswordReq req) {
         final User user = userService.findByEmail(req.email());
 
-        String token = jwtGenerator.resetPassword(user.getId());
+        String token = jwtGenerator.resetPassword(user.getId(), user.getRole());
         emailSender.sendForgotPasswordEmail(user.getEmail(), token);
 
         System.out.println("Reset Password Token:\n" + token);

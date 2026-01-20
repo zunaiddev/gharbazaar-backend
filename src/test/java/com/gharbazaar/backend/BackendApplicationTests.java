@@ -34,5 +34,4 @@ class BackendApplicationTests {
     void DurationTest() {
         System.out.println(Duration.ofDays(15L).toSeconds());
     }
-
 }

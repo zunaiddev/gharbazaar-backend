@@ -35,7 +35,7 @@ public class VerificationServiceImpl implements VerificationService {
         user.setStatus(UserStatus.ACTIVE);
         user = userService.update(user);
 
-        String token = jwtGenerator.authentication(user.getId());
+        String token = jwtGenerator.authentication(user.getId(), user.getRole());
 
         System.out.println("Authentication Token:\n" + token);
 
