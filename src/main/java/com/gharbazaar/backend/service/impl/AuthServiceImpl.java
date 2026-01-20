@@ -38,13 +38,25 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<LoginRes> googleOAuth(String code, HttpServletResponse res) {
         OAuthUser oAuthUser = googleAuth.getOAuthUser(code);
-
         User user = userService.findByEmail(oAuthUser.email(), false);
 
-        if (user == null) {
-            User persisted = userService.save(User.builder().name(oAuthUser.name()).email(oAuthUser.email())
-                    .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
-                    .enabled(true).locked(false).build());
+        if (user == null || !user.isEnabled()) {
+            final User persisted;
+
+            if (user == null) {
+                persisted = userService.save(User.builder().name(oAuthUser.name()).email(oAuthUser.email())
+                        .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
+                        .enabled(true).locked(false).build());
+            } else {
+                user.setName(oAuthUser.name());
+                user.setOAuthClient(OAuthClient.GOOGLE);
+                user.setEnabled(true);
+                user.setStatus(UserStatus.ACTIVE);
+                user.setPassword(null);
+
+                persisted = userService.update(user);
+            }
+
 
             Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId(), persisted.getRole()));
 
@@ -54,27 +66,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (user.isLocked()) throw new LockedException("User is locked");
 
-        if (!user.isEnabled()) {
-            user.setName(oAuthUser.name());
-            user.setOAuthClient(OAuthClient.GOOGLE);
-            user.setEnabled(true);
-            user.setStatus(UserStatus.ACTIVE);
-            user.setPassword(null);
-            userService.update(user);
-
-            Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus()));
-        }
-
-        if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new LoginRes(jwtGenerator.reactivate(user.getId(), user.getRole()), user.getStatus(), user.getDeleteAt()));
-        }
-
-        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus()));
+        return ResponseEntity.ok(this.loginUser(user, res));
     }
 
     @Override
@@ -99,12 +91,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = ((UserPrincipal) Objects.requireNonNull(auth.getPrincipal())).user();
 
-        if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
-            return new LoginRes(jwtGenerator.reactivate(user.getId(), user.getRole()), user.getStatus(), user.getDeleteAt());
-        }
-
-        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
-        return new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus());
+        return this.loginUser(user, res);
     }
 
     @Override
@@ -121,5 +108,15 @@ public class AuthServiceImpl implements AuthService {
 
         System.out.println("Reset Password Token:\n" + token);
         return new ForgotPasswordRes(user.getId(), user.getEmail());
+    }
+
+    private LoginRes loginUser(User user, HttpServletResponse res) {
+        if (user.getStatus().equals(UserStatus.PENDING_DELETE)) {
+            return new LoginRes(jwtGenerator.reactivate(user.getId(),
+                    user.getRole()), user.getStatus(), user.getDeleteAt());
+        }
+
+        Helper.setRefreshCookie(res, jwtGenerator.refresh(user.getId(), user.getRole()));
+        return new LoginRes(jwtGenerator.authentication(user.getId(), user.getRole()), user.getStatus());
     }
 }
