@@ -4,11 +4,11 @@ import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.oauth.GoogleAuth;
+import com.gharbazaar.backend.repository.UsedTokenRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.MethodOrderer;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -16,10 +16,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Transactional
 class UserServiceTest {
     @Autowired
     private UserService service;
+
+    @Autowired
+    private UsedTokenRepository repository;
 
     @MockitoBean
     private GoogleAuth googleAuth;

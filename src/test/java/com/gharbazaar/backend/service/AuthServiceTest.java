@@ -12,6 +12,7 @@ import com.gharbazaar.backend.oauth.GoogleAuth;
 import com.gharbazaar.backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AuthServiceTest {
     @Autowired
@@ -37,9 +39,6 @@ class AuthServiceTest {
 
     @Autowired
     private UserRepository userRepo;
-
-    @Autowired
-    private JwtService jwtService;
 
     @MockitoBean
     private GoogleAuth googleAuth;
@@ -119,6 +118,10 @@ class AuthServiceTest {
 
         verify(emailService).sendEmail(emailCaptor.capture(), emailCaptor.capture(), anyString());
         System.out.println("Email Info: " + emailCaptor.getAllValues());
+        System.out.println("Email Info1: " + emailCaptor.getValue());
+        System.out.println("Email Info2: " + emailCaptor.getValue());
+        System.out.println("Email Info3: " + emailCaptor.getValue());
+
 
         System.out.println("Signup Response: " + res);
     }
