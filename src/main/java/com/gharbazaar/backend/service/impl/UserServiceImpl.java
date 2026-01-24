@@ -5,6 +5,7 @@ import com.gharbazaar.backend.exception.ConflictException;
 import com.gharbazaar.backend.exception.InvalidFileTypeException;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.repository.UserRepository;
+import com.gharbazaar.backend.service.CloudinaryService;
 import com.gharbazaar.backend.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repo;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public User create(String name, String email, String password) {
@@ -83,15 +85,12 @@ public class UserServiceImpl implements UserService {
             throw new InvalidFileTypeException("Invalid file type");
         }
 
-        try {
-            Path path = Paths.get("src/main/resources/avatars");
-
-            if (Files.notExists(path)) Files.createDirectories(path);
-
-            file.transferTo(path.resolve(user.getName()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (user.getProfile() != null) {
+            cloudinaryService.delete(user.getProfile());
         }
+
+        cloudinaryService.upload()
+
 
         return user;
     }
