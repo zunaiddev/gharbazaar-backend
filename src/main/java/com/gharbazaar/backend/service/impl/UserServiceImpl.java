@@ -2,6 +2,7 @@ package com.gharbazaar.backend.service.impl;
 
 import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
+import com.gharbazaar.backend.exception.InvalidFileTypeException;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.repository.UserRepository;
 import com.gharbazaar.backend.service.UserService;
@@ -10,7 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +79,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User uploadAvatar(User user, MultipartFile file) {
-//        file.transferTo();
-        return null;
+        if (!Set.of("/jpeg", "/jpg", "/png").contains(file.getContentType())) {
+            throw new InvalidFileTypeException("Invalid file type");
+        }
+
+        try {
+            Path path = Paths.get("src/main/resources/avatars");
+
+            if (Files.notExists(path)) Files.createDirectories(path);
+
+            file.transferTo(path.resolve(user.getName()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
     }
 }

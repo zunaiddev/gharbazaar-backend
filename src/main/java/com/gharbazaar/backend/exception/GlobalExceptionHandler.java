@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
@@ -111,6 +112,20 @@ public class GlobalExceptionHandler {
     public ErrorRes handleUnverifiedEmailException(UnverifiedEmail ex) {
         log.error("Email is not verified: ", ex);
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.UNVERIFIED_EMAIL, ex.getMessage());
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+    public ErrorRes handleMultipartException(MultipartException ex) {
+        log.error("Multipart Exception: ", ex);
+        return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidFileTypeException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+    public ErrorRes handleMultipartException(InvalidPurposeException ex) {
+        log.error("Invalid file type Exception: ", ex);
+        return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, "Invalid file type. Only .jpeg, .jpg, .png are allowed.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

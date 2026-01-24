@@ -6,6 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 
 class BackendApplicationTests {
@@ -31,7 +35,23 @@ class BackendApplicationTests {
     }
 
     @Test
-    void DurationTest() {
+    void durationTest() {
         System.out.println(Duration.ofDays(15L).toSeconds());
+    }
+
+    @Test
+    void directoryTest() {
+        try {
+            Path path = Paths.get("src/main/resources/avatars");
+
+            if (Files.notExists(path)) {
+                Files.createDirectories(path);
+                System.out.println("Directory Created");
+            }
+
+            System.out.println("Directory Exists Status: " + Files.exists(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -26,6 +26,8 @@ public class User {
     @NotNull
     private String name;
 
+    private String profile;
+
     @NotNull
     private String email;
 
