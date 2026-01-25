@@ -4,6 +4,7 @@ import com.gharbazaar.backend.dto.ErrorRes;
 import com.gharbazaar.backend.enums.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -126,6 +127,13 @@ public class GlobalExceptionHandler {
     public ErrorRes handleMultipartException(InvalidPurposeException ex) {
         log.error("Invalid file type Exception: ", ex);
         return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, "Invalid file type. Only .jpeg, .jpg, .png are allowed.");
+    }
+
+    @ExceptionHandler(SizeLimitExceededException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
+    public ErrorRes handleSizeLimitExceededException(SizeLimitExceededException ex) {
+        log.error("Invalid file type Exception: ", ex);
+        return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, "Request Size Limit Exceeded.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

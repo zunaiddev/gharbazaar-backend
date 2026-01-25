@@ -4,6 +4,7 @@ import com.gharbazaar.backend.dto.*;
 import com.gharbazaar.backend.enums.OAuthClient;
 import com.gharbazaar.backend.enums.Role;
 import com.gharbazaar.backend.enums.UserStatus;
+import com.gharbazaar.backend.model.Profile;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.oauth.GoogleAuth;
 import com.gharbazaar.backend.security.UserPrincipal;
@@ -44,20 +45,21 @@ public class AuthServiceImpl implements AuthService {
             final User persisted;
 
             if (user == null) {
+                Profile profile = new Profile(oAuthUser.picture(), "googleImage", null);
                 persisted = userService.save(User.builder().name(oAuthUser.name()).email(oAuthUser.email())
                         .password(null).role(Role.USER).status(UserStatus.ACTIVE).oAuthClient(OAuthClient.GOOGLE)
-                        .enabled(true).locked(false).build());
+                        .enabled(true).locked(false).profile(profile).build());
             } else {
                 user.setName(oAuthUser.name());
                 user.setOAuthClient(OAuthClient.GOOGLE);
                 user.setEnabled(true);
                 user.setStatus(UserStatus.ACTIVE);
                 user.setPassword(null);
+                user.setProfile(new Profile(oAuthUser.picture(), "googleImage", null));
 
                 persisted = userService.update(user);
             }
-
-
+            
             Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId(), persisted.getRole()));
 
             return ResponseEntity.status(HttpStatus.CREATED)
