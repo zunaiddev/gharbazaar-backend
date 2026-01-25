@@ -17,4 +17,6 @@ public interface UserService {
     User findByEmail(String email);
 
     User uploadAvatar(User user, MultipartFile file);
+
+    void delete(User user, String password);
 }

@@ -26,8 +26,6 @@ public class User {
     @NotNull
     private String name;
 
-    private String profile;
-
     @NotNull
     private String email;
 
@@ -45,6 +43,9 @@ public class User {
     @NotNull
     @Enumerated(EnumType.STRING)
     private OAuthClient oAuthClient;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Profile profile;
 
     @NotNull
     private boolean enabled;

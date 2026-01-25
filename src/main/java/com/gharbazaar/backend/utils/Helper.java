@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.time.Duration;
 
 public class Helper {
+    public static long maxFileSize = 5 * 1024 * 1024;
+
     public static void sendErrorRes(HttpServletResponse res, HttpStatus status, ErrorCode code, String message) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         PrintWriter writer = res.getWriter();
@@ -41,5 +43,11 @@ public class Helper {
         cookie.setSecure(true);
 
         res.addCookie(cookie);
+    }
+
+    public static boolean isImage(String contentType) {
+        return contentType != null && (contentType.startsWith("image/jpeg")
+                || contentType.startsWith("image/jpg")
+                || contentType.startsWith("image/png"));
     }
 }

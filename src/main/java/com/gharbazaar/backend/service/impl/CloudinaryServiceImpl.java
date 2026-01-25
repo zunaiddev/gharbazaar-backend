@@ -2,6 +2,8 @@ package com.gharbazaar.backend.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.gharbazaar.backend.dto.CloudinaryRes;
+import com.gharbazaar.backend.enums.CloudinaryFolder;
 import com.gharbazaar.backend.exception.CloudinaryException;
 import com.gharbazaar.backend.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
@@ -16,20 +18,24 @@ import java.util.Map;
 public class CloudinaryServiceImpl implements CloudinaryService {
     private final Cloudinary cloudinary;
 
+
     @Override
-    public String upload(byte[] bytes) {
+    public CloudinaryRes upload(byte[] bytes, CloudinaryFolder folder) {
         Map<String, Object> options = Map.of(
-                "use_filename", true
+                "use_filename", true,
+                "folder", folder.toString().toLowerCase()
         );
 
         try {
-            Map response = cloudinary.uploader().upload(bytes, options);
-            System.out.println(response);
-
-            return response.get("url").toString();
+            return new CloudinaryRes(cloudinary.uploader().upload(bytes, options));
         } catch (IOException e) {
             throw new CloudinaryException("Could Not Upload File");
         }
+    }
+
+    @Override
+    public CloudinaryRes upload(byte[] bytes) {
+        return this.upload(bytes, CloudinaryFolder.OTHER);
     }
 
     @Override

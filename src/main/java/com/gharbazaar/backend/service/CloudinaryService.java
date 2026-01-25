@@ -1,7 +1,12 @@
 package com.gharbazaar.backend.service;
 
+import com.gharbazaar.backend.dto.CloudinaryRes;
+import com.gharbazaar.backend.enums.CloudinaryFolder;
+
 public interface CloudinaryService {
-    String upload(byte[] bytes);
+    CloudinaryRes upload(byte[] bytes, CloudinaryFolder folder);
+
+    CloudinaryRes upload(byte[] bytes);
 
     void delete(String publicId);
 

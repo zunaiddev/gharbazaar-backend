@@ -2,28 +2,25 @@ package com.gharbazaar.backend.service.impl;
 
 import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
-import com.gharbazaar.backend.exception.InvalidFileTypeException;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.repository.UserRepository;
-import com.gharbazaar.backend.service.CloudinaryService;
+import com.gharbazaar.backend.service.ProfileService;
 import com.gharbazaar.backend.service.UserService;
+import com.gharbazaar.backend.utils.Helper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repo;
-    private final CloudinaryService cloudinaryService;
+    private final ProfileService profileService;
 
     @Override
     public User create(String name, String email, String password) {
@@ -81,17 +78,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User uploadAvatar(User user, MultipartFile file) {
-        if (!Set.of("/jpeg", "/jpg", "/png").contains(file.getContentType())) {
-            throw new InvalidFileTypeException("Invalid file type");
+        validateProfile(file);
+
+
+        try {
+            user.setProfile(profileService.upload(file.getBytes(), user));
+
+            return update(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void delete(User user, String password) {
+
+    }
+
+    private void validateProfile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new MultipartException("File is empty");
         }
 
-        if (user.getProfile() != null) {
-            cloudinaryService.delete(user.getProfile());
+        if (file.getSize() > Helper.maxFileSize) {
+            throw new MultipartException("File size exceeds the limit of " + Helper.maxFileSize + " bytes");
         }
 
-        cloudinaryService.upload()
-
-
-        return user;
+        if (!Helper.isImage(file.getContentType())) {
+            throw new MultipartException("Invalid file type. Only jpeg, jpg and png are allowed");
+        }
     }
 }

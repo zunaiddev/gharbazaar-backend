@@ -1,6 +1,8 @@
 package com.gharbazaar.backend.service.impl;
 
 import com.cloudinary.Cloudinary;
+import com.gharbazaar.backend.dto.CloudinaryRes;
+import com.gharbazaar.backend.enums.CloudinaryFolder;
 import com.gharbazaar.backend.service.CloudinaryService;
 import com.gharbazaar.backend.utils.DotEnv;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,14 @@ class CloudinaryServiceImplTest {
     void upload() throws IOException {
         File file = new File("src/main/resources/avatars/demo.jpeg");
         byte[] bytes = Files.readAllBytes(file.toPath());
-        String url = cloudinaryService.upload(bytes);
-        System.out.println(url);
+
+        CloudinaryRes res = cloudinaryService.upload(bytes, CloudinaryFolder.PROFILES);
+        System.out.println(res);
+    }
+
+    @Test
+    void delete() {
+        cloudinaryService.delete("profiles/file_vzbesg");
+        System.out.println("Deleted");
     }
 }
