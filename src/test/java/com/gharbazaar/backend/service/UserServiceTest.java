@@ -6,17 +6,23 @@ import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.oauth.GoogleAuth;
 import com.gharbazaar.backend.repository.UsedTokenRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
+@ActiveProfiles("db")
 class UserServiceTest {
     @Autowired
     private UserService service;
@@ -26,6 +32,9 @@ class UserServiceTest {
 
     @MockitoBean
     private GoogleAuth googleAuth;
+
+    @MockitoBean
+    private MultipartFile multipartFile;
 
     @Test
     @Order(1)
@@ -124,5 +133,32 @@ class UserServiceTest {
         assertNotNull(user);
 
         System.out.println("User Found By Email(test2@gmail.com): " + user);
+    }
+
+    @Test
+    void uploadProfileImage() throws IOException {
+        User user = new User("John", "john@gmail.com", "John@123", UserStatus.ACTIVE);
+        User savedUser = service.save(user);
+
+        Mockito.when(multipartFile.isEmpty()).thenReturn(false);
+        Mockito.when(multipartFile.getContentType()).thenReturn("image/jpeg");
+        Mockito.when(multipartFile.getSize()).thenReturn(5656L);
+
+        Mockito.when(multipartFile.getBytes())
+                .then(invocation ->
+                        Files.readAllBytes(Paths.get("src/main/resources/avatars/demo.jpeg")));
+
+
+        service.uploadAvatar(savedUser, multipartFile);
+
+        System.out.println("Image Uploaded Successfully");
+
+        Mockito.when(multipartFile.getBytes())
+                .then(invocation ->
+                        Files.readAllBytes(Paths.get("src/main/resources/avatars/demo2.jpg")));
+
+        service.uploadAvatar(savedUser, multipartFile);
+
+        System.out.println("Image re-Uploaded Successfully");
     }
 }

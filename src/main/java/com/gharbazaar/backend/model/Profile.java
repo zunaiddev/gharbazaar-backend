@@ -23,7 +23,6 @@ public class Profile {
     private String publicId;
 
     @OneToOne(mappedBy = "profile")
-    @JoinColumn(nullable = false)
     private User user;
 
     public Profile(String url, String publicId, User user) {

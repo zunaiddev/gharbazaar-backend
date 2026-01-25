@@ -2,6 +2,7 @@ package com.gharbazaar.backend.service.impl;
 
 import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
+import com.gharbazaar.backend.model.Profile;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.repository.UserRepository;
 import com.gharbazaar.backend.service.ProfileService;
@@ -80,11 +81,16 @@ public class UserServiceImpl implements UserService {
     public User uploadAvatar(User user, MultipartFile file) {
         validateProfile(file);
 
+        Profile profile = user.getProfile();
 
         try {
-            user.setProfile(profileService.upload(file.getBytes(), user));
+            if (user.getProfile() == null) {
+                user.setProfile(profileService.upload(file.getBytes(), user));
+                return this.update(user);
+            }
 
-            return update(user);
+            user.setProfile(profileService.reUpload(profileService.findById(profile.getId()), file.getBytes()));
+            return user;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
