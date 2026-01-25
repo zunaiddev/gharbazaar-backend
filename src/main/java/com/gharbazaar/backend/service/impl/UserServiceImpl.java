@@ -1,5 +1,7 @@
 package com.gharbazaar.backend.service.impl;
 
+import com.gharbazaar.backend.dto.PasswordUpdateReq;
+import com.gharbazaar.backend.dto.UserUpdateReq;
 import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
 import com.gharbazaar.backend.model.Profile;
@@ -10,6 +12,7 @@ import com.gharbazaar.backend.service.UserService;
 import com.gharbazaar.backend.utils.Helper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +25,7 @@ import java.time.LocalDateTime;
 public class UserServiceImpl implements UserService {
     private final UserRepository repo;
     private final ProfileService profileService;
+    private final PasswordEncoder encoder;
 
     @Override
     public User create(String name, String email, String password) {
@@ -47,6 +51,25 @@ public class UserServiceImpl implements UserService {
         if (user.getId() == null) throw new IllegalStateException("User ID must be provided while updating");
 
         return repo.save(user);
+    }
+
+    @Override
+    public User update(User user, UserUpdateReq req) {
+        user.setName(req.name());
+        return this.update(user);
+    }
+
+    //ToDo: Fix it
+    @Override
+    public String updatePassword(User user, PasswordUpdateReq req) {
+        if (req.password().equals(req.newPassword())) {
+            throw new ConflictException("New password cannot be the same as the old password");
+        }
+
+        if (encoder.matches(req.password(), user.getPassword()))
+            throw new IllegalArgumentException("Old password cannot be the same as the new password");
+
+        return "Password updated successfully.";
     }
 
     @Override
