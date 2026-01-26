@@ -116,7 +116,7 @@ class AuthServiceTest {
         SignupRes res = service.signup(new SignupReq("John2", "john2@gmail.com", "Pass@123"));
         assertNotNull(res);
 
-        verify(emailService).sendEmail(emailCaptor.capture(), emailCaptor.capture(), anyString());
+        verify(emailService).sendEmail(null, emailCaptor.capture(), emailCaptor.capture(), anyString());
         System.out.println("Email Info: " + emailCaptor.getAllValues());
         System.out.println("Email Info1: " + emailCaptor.getValue());
         System.out.println("Email Info2: " + emailCaptor.getValue());

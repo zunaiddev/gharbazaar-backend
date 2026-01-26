@@ -1,7 +1,9 @@
 package com.gharbazaar.backend.service;
 
-public interface EmailService {
-    void sendEmail(String to, String subject, String content);
+import com.gharbazaar.backend.enums.EmailAlia;
 
-    void sendEmailAsync(String to, String subject, String content);
+public interface EmailService {
+    void sendEmail(EmailAlia from, String to, String subject, String content);
+
+    void sendEmailAsync(EmailAlia from, String to, String subject, String content);
 }

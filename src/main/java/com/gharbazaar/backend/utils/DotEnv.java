@@ -33,6 +33,14 @@ public class DotEnv {
         }
     }
 
+    public static void load() {
+        Map<String, String> env = new DotEnv().getAll();
+
+        for (String key : env.keySet()) {
+            System.setProperty(key, env.get(key));
+        }
+    }
+
     public String get(String key) {
         return env.get(key);
     }

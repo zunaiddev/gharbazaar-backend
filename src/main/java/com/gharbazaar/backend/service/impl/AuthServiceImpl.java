@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 
                 persisted = userService.update(user);
             }
-            
+
             Helper.setRefreshCookie(res, jwtGenerator.refresh(persisted.getId(), persisted.getRole()));
 
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtGenerator.verification(user.getId(), user.getRole());
 
         System.out.println("Verification Token:\n" + token);
-        emailSender.sendVerificationEmail(user.getEmail(), token);
+        emailSender.sendVerificationEmail(user.getName(), user.getEmail(), token);
         return new SignupRes(user);
     }
 
@@ -106,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
         final User user = userService.findByEmail(req.email());
 
         String token = jwtGenerator.resetPassword(user.getId(), user.getRole());
-        emailSender.sendForgotPasswordEmail(user.getEmail(), token);
+        emailSender.sendForgotPasswordEmail(user.getName(), user.getEmail(), token);
 
         System.out.println("Reset Password Token:\n" + token);
         return new ForgotPasswordRes(user.getId(), user.getEmail());

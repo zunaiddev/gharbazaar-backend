@@ -1,6 +1,7 @@
 package com.gharbazaar.backend;
 
 import com.gharbazaar.backend.dto.ErrorRes;
+import com.gharbazaar.backend.enums.EmailAlia;
 import com.gharbazaar.backend.enums.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -53,5 +54,10 @@ class BackendApplicationTests {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void test() {
+        System.out.println(EmailAlia.NO_REPLY.getAlias());
     }
 }
