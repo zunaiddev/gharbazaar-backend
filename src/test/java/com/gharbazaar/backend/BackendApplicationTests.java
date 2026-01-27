@@ -3,6 +3,7 @@ package com.gharbazaar.backend;
 import com.gharbazaar.backend.dto.ErrorRes;
 import com.gharbazaar.backend.enums.EmailAlia;
 import com.gharbazaar.backend.enums.ErrorCode;
+import com.gharbazaar.backend.utils.ReferenceIdGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import tools.jackson.databind.ObjectMapper;
@@ -12,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 class BackendApplicationTests {
 
@@ -59,5 +62,26 @@ class BackendApplicationTests {
     @Test
     void test() {
         System.out.println(EmailAlia.NO_REPLY.getAlias());
+    }
+
+    @Test
+    void generate() {
+        List<String> list = new ArrayList<>();
+
+        for (int i = 0; i < 100000; i++) {
+            list.add(ReferenceIdGenerator.generate());
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            String element = list.get(i);
+
+            for (int j = 0; j < 100000; j++) {
+                if (i == j) continue;
+
+                if (element.equals(list.get(j))) {
+                    System.out.println("Element Found: " + element);
+                }
+            }
+        }
     }
 }
