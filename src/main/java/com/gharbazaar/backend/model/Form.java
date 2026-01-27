@@ -1,13 +1,14 @@
 package com.gharbazaar.backend.model;
 
 import com.gharbazaar.backend.dto.FormReq;
+import com.gharbazaar.backend.utils.ReferenceIdGenerator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ public class Form {
     @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false, length = 150, unique = true)
+    @Column(nullable = false, length = 150)
     private String email;
 
     @Column(nullable = false, length = 150)
@@ -36,7 +37,10 @@ public class Form {
     private String message;
 
     @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    private String referenceId;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     public Form(FormReq req) {
         this.name = req.name();
@@ -48,6 +52,7 @@ public class Form {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = Instant.now();
+        this.referenceId = ReferenceIdGenerator.generate();
+        this.createdAt = LocalDateTime.now();
     }
 }
