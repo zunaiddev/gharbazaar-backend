@@ -1,6 +1,7 @@
 package com.gharbazaar.backend.utils;
 
 import com.gharbazaar.backend.enums.EmailAlia;
+import com.gharbazaar.backend.model.Form;
 import com.gharbazaar.backend.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,14 @@ public class EmailSender {
                 .replace("${verificationLink}", getLink(token))
                 .replace("${expiry}", "15 Minutes")
                 .replace("${email}", to));
+    }
+
+    public void sendFormEmail(Form form) {
+
+    }
+
+    public void sendAdminFormEmail(Form form, String to) {
+
     }
 
     private String getLink(String token) {
