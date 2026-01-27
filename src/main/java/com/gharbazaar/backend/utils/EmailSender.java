@@ -45,7 +45,8 @@ public class EmailSender {
         emailService.sendEmail(EmailAlia.NO_REPLY, to, "Reset your password", RESET_PASSWORD_TEMPLATE
                 .replace("${username}", name)
                 .replace("${verificationLink}", getLink(token))
-                .replace("${expiry}", "15 Minutes"));
+                .replace("${expiry}", "15 Minutes")
+                .replace("${email}", to));
     }
 
     private String getLink(String token) {
