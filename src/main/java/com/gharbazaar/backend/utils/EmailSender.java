@@ -4,11 +4,12 @@ import com.gharbazaar.backend.enums.EmailAlia;
 import com.gharbazaar.backend.model.Form;
 import com.gharbazaar.backend.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class EmailSender {
@@ -19,25 +20,20 @@ public class EmailSender {
     private final String FORM_EMAIL_TEMPLATE;
     private final String ADMIN_FORM_EMAIL_TEMPLATE;
 
-    public EmailSender(EmailService emailService, @Value("${BASE_URL}") String baseUrl) {
+    public EmailSender(EmailService emailService,
+                       @Value("${BASE_URL}") String baseUrl) {
+
         this.emailService = emailService;
         this.BASE_URL = baseUrl;
 
         try {
-            FileReader verifyEmail = new FileReader("src/main/resources/templates/verify-email.html");
-            FileReader resetPassword = new FileReader("src/main/resources/templates/reset-password.html");
-            FileReader formEmail = new FileReader("src/main/resources/templates/form-email.html");
-            FileReader adminFormEmail = new FileReader("src/main/resources/templates/admin-form-email.html");
+            this.VERIFY_EMAIL_TEMPLATE = loadTemplate("templates/verify-email.html");
+            this.RESET_PASSWORD_TEMPLATE = loadTemplate("templates/reset-password.html");
+            this.FORM_EMAIL_TEMPLATE = loadTemplate("templates/form-email.html");
+            this.ADMIN_FORM_EMAIL_TEMPLATE = loadTemplate("templates/admin-form-email.html");
 
-            this.VERIFY_EMAIL_TEMPLATE = verifyEmail.readAllAsString();
-            this.RESET_PASSWORD_TEMPLATE = resetPassword.readAllAsString();
-            this.FORM_EMAIL_TEMPLATE = formEmail.readAllAsString();
-            this.ADMIN_FORM_EMAIL_TEMPLATE = adminFormEmail.readAllAsString();
-
-            verifyEmail.close();
-            resetPassword.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to load email templates", e);
         }
     }
 
@@ -82,5 +78,10 @@ public class EmailSender {
 
     private String getLink(String token) {
         return BASE_URL + token;
+    }
+
+    private String loadTemplate(String path) throws IOException {
+        ClassPathResource resource = new ClassPathResource(path);
+        return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 }
