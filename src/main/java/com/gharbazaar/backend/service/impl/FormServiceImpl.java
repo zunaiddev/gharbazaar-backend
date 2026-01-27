@@ -29,6 +29,7 @@ public class FormServiceImpl implements FormService {
         Form form = repo.save(new Form(req));
 
         emailSender.sendFormEmail(form);
+        emailSender.sendAdminFormEmail(form, "work87t@gmail.com");
         emailSender.sendAdminFormEmail(form, "ja7667924@gmail.com");
 
         return new FormRes(form);

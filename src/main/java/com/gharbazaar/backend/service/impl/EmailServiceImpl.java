@@ -35,6 +35,8 @@ public class EmailServiceImpl implements EmailService {
         }
 
         sender.send(message);
+
+        System.out.println("Email Sent to: " + to);
     }
 
 
