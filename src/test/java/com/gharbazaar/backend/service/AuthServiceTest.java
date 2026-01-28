@@ -10,13 +10,10 @@ import com.gharbazaar.backend.helpers.TestHelper;
 import com.gharbazaar.backend.model.User;
 import com.gharbazaar.backend.oauth.GoogleAuth;
 import com.gharbazaar.backend.repository.UserRepository;
+import com.gharbazaar.backend.utils.DotEnv;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-@Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AuthServiceTest {
     @Autowired
@@ -48,6 +44,23 @@ class AuthServiceTest {
 
     @MockitoBean
     private EmailService emailService;
+
+    @BeforeAll
+    static void init() {
+        DotEnv.load();
+    }
+
+    @Test
+    void googlOAuthBasicTest() {
+        when(googleAuth.getOAuthUser("testCode"))
+                .thenReturn(new OAuthUser("AuthUser", "auth@gmail.com", "test", true));
+
+        ResponseEntity<LoginRes> res1 = service.googleOAuth("testCode", this.response);
+        System.out.println(res1);
+
+        ResponseEntity<LoginRes> res2 = service.googleOAuth("testCode", this.response);
+        System.out.println(res2);
+    }
 
     // ToDo: decode token for each res and add a method to the helper class to validate all the tokens
     @Test

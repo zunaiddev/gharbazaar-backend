@@ -56,6 +56,7 @@ public class GoogleAuth {
 
             return oAuthRes;
         } catch (RestClientException e) {
+            System.out.println("OAuth Exception While getting IdToken: " + e.getMessage());
             throw new OAuthException("Error Getting Access Token: ", e);
         }
     }
@@ -77,6 +78,7 @@ public class GoogleAuth {
 
             return user;
         } catch (RestClientException e) {
+            System.out.println("OAuth Exception While getting user info: " + e.getMessage());
             throw new OAuthException("Error Getting Access Token: ", e);
         }
     }

@@ -30,7 +30,7 @@ public class FormServiceImpl implements FormService {
 
         emailSender.sendFormEmail(form);
         emailSender.sendAdminFormEmail(form, "work87t@gmail.com");
-        emailSender.sendAdminFormEmail(form, "ja7667924@gmail.com");
+        emailSender.sendAdminFormEmail(form, "adityaprajapati1234567@gmail.com");
 
         return new FormRes(form);
     }

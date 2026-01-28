@@ -30,7 +30,6 @@ public class User {
     private String email;
 
     //    private String phone;
-    @NotNull
     private String password;
 
     @NotNull

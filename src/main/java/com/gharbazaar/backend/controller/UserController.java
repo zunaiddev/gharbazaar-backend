@@ -1,8 +1,11 @@
 package com.gharbazaar.backend.controller;
 
+import com.gharbazaar.backend.dto.PasswordUpdateReq;
 import com.gharbazaar.backend.dto.UserRes;
+import com.gharbazaar.backend.dto.UserUpdateReq;
 import com.gharbazaar.backend.security.UserPrincipal;
 import com.gharbazaar.backend.service.UserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +21,16 @@ public class UserController {
     @GetMapping
     public UserRes getInfo(@AuthenticationPrincipal UserPrincipal details) {
         return new UserRes(details.user());
+    }
+
+    @PatchMapping
+    public UserRes updateName(@AuthenticationPrincipal UserPrincipal details, @RequestBody @Valid UserUpdateReq req) {
+        return new UserRes(service.update(details.user(), req));
+    }
+
+    @PatchMapping("/password")
+    public String updatePassword(@AuthenticationPrincipal UserPrincipal details, @RequestBody @Valid PasswordUpdateReq req) {
+        return service.updatePassword(details.user(), req);
     }
 
     @PutMapping("/profile")

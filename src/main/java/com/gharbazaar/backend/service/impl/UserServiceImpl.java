@@ -12,6 +12,7 @@ import com.gharbazaar.backend.service.UserService;
 import com.gharbazaar.backend.utils.Helper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartException;
@@ -59,15 +60,22 @@ public class UserServiceImpl implements UserService {
         return this.update(user);
     }
 
-    //ToDo: Fix it
     @Override
     public String updatePassword(User user, PasswordUpdateReq req) {
         if (req.password().equals(req.newPassword())) {
             throw new ConflictException("New password cannot be the same as the old password");
         }
 
-        if (encoder.matches(req.password(), user.getPassword()))
-            throw new IllegalArgumentException("Old password cannot be the same as the new password");
+        if (!encoder.matches(req.password(), user.getPassword())) {
+            throw new BadCredentialsException("Invalid password.");
+        }
+
+        if (encoder.matches(req.newPassword(), user.getPassword())) {
+            throw new ConflictException("Please choose a password that is different from your current password.");
+        }
+
+        user.setPassword(encoder.encode(req.newPassword()));
+        this.update(user);
 
         return "Password updated successfully.";
     }

@@ -27,63 +27,63 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorRes handleException(Exception ex) {
-        log.error("Internal Server Error: ", ex);
+        log.error("Internal Server Error: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.INTERNAL_SERVER_ERROR, "Something Went Wrong");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorRes handleLockedException(BadCredentialsException ex) {
-        log.error("User is Locked: ", ex);
+        log.error("Bad Credentials: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.UNAUTHORIZED, "Invalid Email or Password");
     }
 
     @ExceptionHandler(LockedException.class)
     @ResponseStatus(HttpStatus.LOCKED)
     public ErrorRes handleLockedException(LockedException ex) {
-        log.error("User is Locked: ", ex);
+        log.error("User is Locked: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.LOCKED, "User is Locked");
     }
 
     @ExceptionHandler(DisabledException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorRes handleDisabledException(DisabledException ex) {
-        log.error("User is Disabled: ", ex);
+        log.error("User is Disabled: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.FORBIDDEN, ErrorCode.DISABLED, "User is Disabled");
     }
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorRes handleConflictException(ConflictException ex) {
-        log.error("Conflict Exception: ", ex);
+        log.error("Conflict Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorRes handleResourceException(NoResourceFoundException ex) {
-        log.error("Not Found Exception: ", ex);
+        log.error("Not Found Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.NOT_FOUND, "No static resource " + ex.getResourcePath());
     }
 
     @ExceptionHandler(InvalidPurposeException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorRes handlePurposeException(InvalidPurposeException ex) {
-        log.error("Invalid Token Purpose Exception: ", ex);
+        log.error("Invalid Token Purpose Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.FORBIDDEN, ErrorCode.INVALID_PURPOSE, ex.getMessage());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleMediaTypeException(HttpMediaTypeNotSupportedException ex) {
-        log.error("Invalid Request body: ", ex);
+        log.error("Invalid Request body: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST_BODY, ex.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleEntityNotFound(EntityNotFoundException ex) {
-        log.error("Invalid Request body: ", ex);
+        log.error("Invalid Request body: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND, ex.getMessage());
     }
 
@@ -97,42 +97,42 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OAuthException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleOAuthException(OAuthException ex) {
-        log.error("OAuth Exception: ", ex.getCause());
+        log.error("OAuth Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.OAUTH_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(ScopeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleScopeException(ScopeException ex) {
-        log.error("Invalid OAuth Scope: ", ex);
+        log.error("Invalid OAuth Scope: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_SCOPE, ex.getMessage());
     }
 
     @ExceptionHandler(UnverifiedEmail.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorRes handleUnverifiedEmailException(UnverifiedEmail ex) {
-        log.error("Email is not verified: ", ex);
+        log.error("Email is not verified: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.BAD_REQUEST, ErrorCode.UNVERIFIED_EMAIL, ex.getMessage());
     }
 
     @ExceptionHandler(MultipartException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ErrorRes handleMultipartException(MultipartException ex) {
-        log.error("Multipart Exception: ", ex);
+        log.error("Multipart Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidFileTypeException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ErrorRes handleMultipartException(InvalidPurposeException ex) {
-        log.error("Invalid file type Exception: ", ex);
+        log.error("Invalid file type Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, "Invalid file type. Only .jpeg, .jpg, .png are allowed.");
     }
 
     @ExceptionHandler(SizeLimitExceededException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
     public ErrorRes handleSizeLimitExceededException(SizeLimitExceededException ex) {
-        log.error("Invalid file type Exception: ", ex);
+        log.error("Invalid file Size Exception: {}", ex.getMessage());
         return new ErrorRes(HttpStatus.UNPROCESSABLE_CONTENT, ErrorCode.INVALID_REQUEST_BODY, "Request Size Limit Exceeded.");
     }
 
