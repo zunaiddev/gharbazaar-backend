@@ -23,8 +23,8 @@ import java.util.List;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
-                                           VerificationFilter verificationFilter, AuthenticationFilter authFilter) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter,
+                                                   VerificationFilter verificationFilter, AuthenticationFilter authFilter) {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(req -> req
@@ -46,7 +46,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
             @Value("${BASE_URL}") String BASE_URL) {
-        System.out.println(BASE_URL);
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(BASE_URL));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

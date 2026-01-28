@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CloudinaryConfig {
     @Bean
-    public Cloudinary getCloudinary(@Value("${CLOUDINARY_URL}") String CLOUDINARY_URL) {
+    public Cloudinary cloudinary(@Value("${CLOUDINARY_URL}") String CLOUDINARY_URL) {
         return new Cloudinary(CLOUDINARY_URL);
     }
 }
