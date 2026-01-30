@@ -25,9 +25,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile findByUserId(long id) {
-        return repo.findByUserId(id)
-                .orElseThrow(() -> new EntityNotFoundException("Profile not found with user id: " + id));
+    public Profile findByUser(User user) {
+        return repo.findByUser(user)
+                .orElseThrow(() -> new EntityNotFoundException("Profile not found with user id: " + user.getId()));
     }
 
     @Override

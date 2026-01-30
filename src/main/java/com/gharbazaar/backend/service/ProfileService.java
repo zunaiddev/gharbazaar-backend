@@ -6,7 +6,7 @@ import com.gharbazaar.backend.model.User;
 public interface ProfileService {
     Profile findById(long id);
 
-    Profile findByUserId(long id);
+    Profile findByUser(User user);
 
     Profile save(Profile profile);
 

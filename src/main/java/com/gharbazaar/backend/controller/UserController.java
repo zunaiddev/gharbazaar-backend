@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping
     public UserRes getInfo(@AuthenticationPrincipal UserPrincipal details) {
-        return new UserRes(details.user());
+        return service.getInfo(details.user());
     }
 
     @PatchMapping

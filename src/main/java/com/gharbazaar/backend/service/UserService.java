@@ -1,11 +1,14 @@
 package com.gharbazaar.backend.service;
 
 import com.gharbazaar.backend.dto.PasswordUpdateReq;
+import com.gharbazaar.backend.dto.UserRes;
 import com.gharbazaar.backend.dto.UserUpdateReq;
 import com.gharbazaar.backend.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
+    UserRes getInfo(User user);
+
     User create(String name, String email, String password);
 
     User update(User user, UserUpdateReq req);

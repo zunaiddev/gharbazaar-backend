@@ -11,10 +11,13 @@ import java.time.LocalDateTime;
 public record UserRes(long id, String name, String email, String profile,
                       Role role, UserStatus status, OAuthClient authClient,
                       boolean enabled, boolean locked, LocalDateTime createdAt) {
-    public UserRes(User user) {
-        Profile profile = user.getProfile();
-        this(user.getId(), user.getName(), user.getEmail(), profile == null ? null : profile.getUrl(),
+    public UserRes(User user, Profile profile) {
+        this(user.getId(), user.getName(), user.getEmail(), profile != null ? profile.getUrl() : null,
                 user.getRole(), user.getStatus(), user.getOAuthClient(),
                 user.isEnabled(), user.isLocked(), user.getCreatedAt());
+    }
+
+    public UserRes(User user) {
+        this(user, null);
     }
 }

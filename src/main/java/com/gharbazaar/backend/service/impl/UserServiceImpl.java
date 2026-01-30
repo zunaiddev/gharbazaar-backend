@@ -1,6 +1,7 @@
 package com.gharbazaar.backend.service.impl;
 
 import com.gharbazaar.backend.dto.PasswordUpdateReq;
+import com.gharbazaar.backend.dto.UserRes;
 import com.gharbazaar.backend.dto.UserUpdateReq;
 import com.gharbazaar.backend.enums.UserStatus;
 import com.gharbazaar.backend.exception.ConflictException;
@@ -27,6 +28,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repo;
     private final ProfileService profileService;
     private final PasswordEncoder encoder;
+
+    @Override
+    public UserRes getInfo(User user) {
+        Profile profile = profileService.findByUser(user);
+
+        return new UserRes(user, profile);
+    }
 
     @Override
     public User create(String name, String email, String password) {
